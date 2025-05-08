@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Spotify Mood → MBTI Predictor</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Acme&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #f7ecf6;
+      --purple: #6E5D90;
+      --light-purple: #C9B6E3;
+      --dark: #2b1d42;
+      --card-bg: #eac3ec;
+      --shadow: rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--bg);
+      font-family: 'Acme', sans-serif;
+      color: var(--dark);
+    }
+
+    nav {
+      font-family: 'Silkscreen', sans-serif;
+      background-color: var(--purple);
+      color: white;
+      padding: 18px 30px;
+      font-size: 18px;
+      text-align: center;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 50px 20px;
+      text-align: center;
+    }
+
+    h1 {
+      font-family: 'Silkscreen', sans-serif;
+      font-size: 26px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 30px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      margin: 12px 0 20px;
+      border: 2px solid var(--light-purple);
+      border-radius: 10px;
+      font-size: 15px;
+      background-color: #fefafe;
+      color: var(--dark);
+    }
+
+    button {
+      background-color: var(--purple);
+      color: white;
+      font-family: 'Acme', sans-serif;
+      font-weight: 10;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.3s;
+      box-shadow: 2px 2px 5px var(--shadow);
+    }
+
+    button:hover {
+      background-color: var(--light-purple);
+      color: var(--dark);
+    }
+
+    #loading {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    #loading img {
+      height: 40px;
+    }
+
+    .mbti-box {
+      background-color: var(--card-bg);
+      border-left: 6px solid var(--light-purple);
+      padding: 20px;
+      margin-top: 40px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px var(--shadow);
+    }
+
+    .mbti-type {
+      font-family: 'Silkscreen', sans-serif;
+      font-size: 20px;
+      color: var(--dark);
+    }
+
+    ul {
+      margin-top: 30px;
+      padding: 0;
+      list-style: none;
+    }
+
+    li {
+      margin-bottom: 20px;
+    }
+
+    details summary {
+      font-weight: bold;
+      cursor: pointer;
+      background-color: var(--light-purple);
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--purple);
+      font-family: 'Silkscreen', sans-serif;
+    }
+
+    pre {
+      background-color: #fff;
+      padding: 10px;
+      border-radius: 5px;
+      text-align: left;
+      font-size: 13px;
+      margin-top: 5px;
+      overflow-x: auto;
+      font-family: 'Acme', sans-serif;
+    }
+
+    .mood-preview {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin-top: 60px;
+      gap: 20px;
+    }
+
+    .mood-card {
+      background-color: var(--card-bg);
+      padding: 15px;
+      border-radius: 12px;
+      width: 160px;
+      box-shadow: 0 2px 4px var(--shadow);
+      text-align: center;
+    }
+
+    .mood-card img {
+      width: 50%;
+      height: auto;  
+    }
+
+    .mood-name {
+      font-family: 'Silkscreen', sans-serif;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: #666;
+      padding: 30px 0;
+      margin-top: 60px;
+    }
+
+    .acme-text {
+      font-family: 'Acme', sans-serif;
+      font-size: 14px;
+      font-weight: normal;
+    }
+  </style>
+</head>
+<body>
+
+<nav>🎧 SPOTIFY MOOD → MBTI PREDICTOR 🎧</nav>
+
+<div class="container">
+  <h1>DISCOVER YOUR MBTI FROM YOUR MUSIC TASTE 🎵</h1>
+
+  <label for="playlist_url">Enter Spotify Playlist URL:</label>
+  <input type="text" id="playlist_url" placeholder="https://open.spotify.com/playlist/..." />
+  <button onclick="predictPlaylistMood()">Predict Playlist</button>
+
+  <div id="loading">
+    <img src="{{ url_for('static', filename='heartsloading.jpg') }}" alt="Loading...">
+    <p>Analyzing your playlist...</p>
+  </div>
+
+  <div id="mbti_result"></div>
+  <ul id="results"></ul>
+
+<div class="mood-preview">
+  <div class="mood-card">
+    <img src="/static/keroppi.gif" class="mood-img" alt="Joyful">
+    <div class="mood-name">Joyful</div>
+  </div>
+  <div class="mood-card">
+    <img src="/static/cinnamoroll.gif" class="mood-img" alt="Calm">
+    <div class="mood-name">Calm</div>
+  </div>
+  <div class="mood-card">
+    <img src="/static/overwhelmed.gif" class="mood-img" alt="Sad">
+    <div class="mood-name">Sad</div>
+  </div>
+  <div class="mood-card">
+    <img src="/static/sanrio-my-melody.gif" class="mood-img" alt="Energetic">
+    <div class="mood-name">Energetic</div>
+  </div>
+  <div class="mood-card">
+    <img src="/static/ibunwoo-my-melody.gif" class="mood-img" alt="Melancholic">
+    <div class="mood-name">Melancholic</div>
+  </div>
+</div>
+
+
+<footer>
+  💖 Built by Tala · Powered by Spotify & GPT · MBTI is fun, not fate
+</footer>
+
+<script>
+  function getMbtiDescription(mbti) {
+    const descriptions = {
+      INFP: "The Mediator – empathetic, creative, idealistic",
+      INFJ: "The Advocate – insightful, principled, reserved",
+      ENFP: "The Campaigner – enthusiastic, imaginative, sociable",
+      ISFP: "The Adventurer – gentle, sensitive, artistic",
+      ESFP: "The Entertainer – fun-loving, spontaneous, energetic",
+      INTJ: "The Architect – strategic, analytical, independent",
+      ISTP: "The Virtuoso – practical, bold, hands-on",
+      ENTJ: "The Commander – confident, decisive, driven",
+      ENFJ: "The Protagonist – charismatic, inspiring, altruistic",
+      ESTP: "The Entrepreneur – energetic, perceptive, daring",
+      ISFJ: "The Defender – loyal, meticulous, caring",
+      ESTJ: "The Executive – organized, assertive, loyal"
+    };
+    return descriptions[mbti] || "A unique and balanced individual.";
+  }
+
+  async function predictPlaylistMood() {
+    const playlistUrl = document.getElementById("playlist_url").value;
+    const resultsList = document.getElementById("results");
+    const mbtiResult = document.getElementById("mbti_result");
+    const loadingDiv = document.getElementById("loading");
+
+    resultsList.innerHTML = '';
+    mbtiResult.innerHTML = '';
+    loadingDiv.style.display = 'block';
+
+    const response = await fetch('/predict_playlist_rf', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ playlist_url: playlistUrl })
+    });
+
+    const data = await response.json();
+    loadingDiv.style.display = 'none';
+
+    if (data.error) {
+      resultsList.innerHTML = `<li style="color:red;">Error: ${data.error}</li>`;
+      return;
+    }
+
+    if (data.mbti) {
+  const gptRes = await fetch('/generate_mbti_description', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mbti: data.mbti })
+  });
+  const gptData = await gptRes.json();
+
+  document.getElementById("mbti_result").innerHTML = `
+    <div class="mbti-box">
+      🧠 <span class="mbti-type">Predicted MBTI: ${data.mbti}</span><br>
+      ${gptData.description || "Could not load description."}
+    </div>`;
+}
+
+    data.songs.forEach(song => {
+      const summary = `
+        <span>${song.artist} — ${song.title}</span>
+        <span class="acme-text"> → Mood: ${song.predicted_mood} (${song.model_used})</span>
+      `;
+
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <details>
+          <summary><strong>${summary}</strong></summary>
+          <pre>${song.lyrics}</pre>
+        </details>`;
+      resultsList.appendChild(li);
+    });
+  }
+</script>
+
+</body>
+</html>
